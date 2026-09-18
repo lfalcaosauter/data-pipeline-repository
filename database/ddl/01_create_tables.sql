@@ -14,7 +14,7 @@
 -- TABLE: agencias
 -- ============================================================
 
-CREATE TABLE agencias (
+CREATE TABLE IF NOT EXISTS agencias (
     agencia_id INT PRIMARY KEY,
     nome_agencia VARCHAR(50) NOT NULL,
     cidade VARCHAR(50) NOT NULL
@@ -25,7 +25,7 @@ CREATE TABLE agencias (
 -- TABLE: clientes
 -- ============================================================
 
-CREATE TABLE clientes (
+CREATE TABLE IF NOT EXISTS clientes (
     cliente_id INT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(11) NOT NULL UNIQUE,
@@ -37,7 +37,7 @@ CREATE TABLE clientes (
 -- TABLE: tipos_transacao
 -- ============================================================
 
-CREATE TABLE tipos_transacao (
+CREATE TABLE IF NOT EXISTS tipos_transacao (
     tipo_transacao_id INT PRIMARY KEY,
     descricao VARCHAR(50) NOT NULL
 );
@@ -47,7 +47,7 @@ CREATE TABLE tipos_transacao (
 -- TABLE: contas
 -- ============================================================
 
-CREATE TABLE contas (
+CREATE TABLE IF NOT EXISTS contas (
     conta_id INT PRIMARY KEY,
     cliente_id INT NOT NULL,
     agencia_id INT NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE contas (
 -- TABLE: cartoes
 -- ============================================================
 
-CREATE TABLE cartoes (
+CREATE TABLE IF NOT EXISTS cartoes (
     cartao_id INT PRIMARY KEY,
     conta_id INT NOT NULL,
     numero_cartao VARCHAR(16) NOT NULL UNIQUE,
@@ -83,7 +83,7 @@ CREATE TABLE cartoes (
 -- TABLE: emprestimos
 -- ============================================================
 
-CREATE TABLE emprestimos (
+CREATE TABLE IF NOT EXISTS emprestimos (
     emprestimo_id INT PRIMARY KEY,
     cliente_id INT NOT NULL,
     valor_contratado NUMERIC(15, 2) NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE emprestimos (
 -- TABLE: transacoes
 -- ============================================================
 
-CREATE TABLE transacoes (
+CREATE TABLE IF NOT EXISTS transacoes (
     transacao_id INT PRIMARY KEY,
     conta_origem_id INT NOT NULL,
     conta_destino_id INT NOT NULL,

@@ -15,6 +15,8 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./database/ddl/01_create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql:ro
+      - ./database/seeds/01_seed_transaction_types.sql:/docker-entrypoint-initdb.d/02_seed_transaction_types.sql:ro
 
     healthcheck:
       test:
