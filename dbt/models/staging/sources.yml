@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: silver
+    description: "Validated Silver layer loaded into PostgreSQL."
+    schema: silver
+
+    tables:
+      - name: agencias
+        description: "Bank branches."
+
+      - name: clientes
+        description: "Bank customers."
+
+      - name: contas
+        description: "Bank accounts."
+
+      - name: cartoes
+        description: "Bank cards."
+
+      - name: emprestimos
+        description: "Customer loans."
+
+      - name: tipos_transacao
+        description: "Transaction types."
+
+      - name: transacoes
+        description: "Bank transactions."

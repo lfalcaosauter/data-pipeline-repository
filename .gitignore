@@ -40,3 +40,7 @@ htmlcov/
 
 # MyPy
 .mypy_cache/
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/

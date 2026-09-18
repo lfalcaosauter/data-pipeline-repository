@@ -1,0 +1,132 @@
+version: 2
+
+models:
+  - name: dim_cliente
+    description: "Customer dimension."
+    columns:
+      - name: cliente_sk
+        description: "Surrogate key for the customer dimension."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cliente_id
+        description: "Source customer identifier."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: dim_conta
+    description: "Account dimension."
+    columns:
+      - name: conta_sk
+        description: "Surrogate key for the account dimension."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: conta_id
+        description: "Source account identifier."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: dim_data
+    description: "Date dimension."
+    columns:
+      - name: data_sk
+        description: "Surrogate key for the date dimension."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: data
+        description: "Calendar date."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: dim_tipo_transacao
+    description: "Transaction type dimension."
+    columns:
+      - name: tipo_transacao_sk
+        description: "Surrogate key for the transaction type dimension."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: tipo_transacao_id
+        description: "Source transaction type identifier."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: fato_transacao
+    description: "Transaction fact table at one-row-per-transaction grain."
+    columns:
+      - name: transacao_sk
+        description: "Surrogate key for the transaction fact."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: transacao_id
+        description: "Source transaction identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cliente_sk
+        description: "Customer dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_cliente')
+                field: cliente_sk
+
+      - name: conta_origem_sk
+        description: "Origin account dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_conta')
+                field: conta_sk
+
+      - name: conta_destino_sk
+        description: "Destination account dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_conta')
+                field: conta_sk
+
+      - name: data_sk
+        description: "Date dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_data')
+                field: data_sk
+
+      - name: tipo_transacao_sk
+        description: "Transaction type dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_tipo_transacao')
+                field: tipo_transacao_sk
+
+      - name: valor
+        description: "Transaction amount."
+        data_tests:
+          - not_null
+
+      - name: data_hora
+        description: "Transaction timestamp."
+        data_tests:
+          - not_null

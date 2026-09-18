@@ -1,0 +1,144 @@
+version: 2
+
+models:
+  - name: stg_agencias
+    description: "Staging model for bank branches."
+    columns:
+      - name: agencia_id
+        description: "Unique branch identifier."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_clientes
+    description: "Staging model for bank customers."
+    columns:
+      - name: cliente_id
+        description: "Unique customer identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cpf
+        description: "Customer CPF."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_contas
+    description: "Staging model for bank accounts."
+    columns:
+      - name: conta_id
+        description: "Unique account identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cliente_id
+        description: "Customer associated with the account."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_clientes')
+                field: cliente_id
+
+      - name: agencia_id
+        description: "Branch associated with the account."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_agencias')
+                field: agencia_id
+
+  - name: stg_cartoes
+    description: "Staging model for bank cards."
+    columns:
+      - name: cartao_id
+        description: "Unique card identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: conta_id
+        description: "Account associated with the card."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_contas')
+                field: conta_id
+
+  - name: stg_emprestimos
+    description: "Staging model for customer loans."
+    columns:
+      - name: emprestimo_id
+        description: "Unique loan identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cliente_id
+        description: "Customer associated with the loan."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_clientes')
+                field: cliente_id
+
+  - name: stg_tipos_transacao
+    description: "Staging model for transaction types."
+    columns:
+      - name: tipo_transacao_id
+        description: "Unique transaction type identifier."
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_transacoes
+    description: "Staging model for bank transactions."
+    columns:
+      - name: transacao_id
+        description: "Unique transaction identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: conta_origem_id
+        description: "Origin account."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_contas')
+                field: conta_id
+
+      - name: conta_destino_id
+        description: "Destination account."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_contas')
+                field: conta_id
+
+      - name: tipo_transacao_id
+        description: "Transaction type."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_tipos_transacao')
+                field: tipo_transacao_id
+
+      - name: valor
+        description: "Transaction amount."
+        data_tests:
+          - not_null
+
+      - name: data_hora
+        description: "Transaction timestamp."
+        data_tests:
+          - not_null
