@@ -56,7 +56,7 @@ models:
           - unique
 
       - name: tipo_transacao_id
-        description: "Source transaction type identifier."
+        description: "Source transaction identifier."
         data_tests:
           - not_null
           - unique
@@ -128,5 +128,58 @@ models:
 
       - name: data_hora
         description: "Transaction timestamp."
+        data_tests:
+          - not_null
+
+  - name: fato_emprestimo
+    description: "Loan fact table at one-row-per-loan grain."
+    columns:
+      - name: emprestimo_sk
+        description: "Surrogate key for the loan fact."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: emprestimo_id
+        description: "Source loan identifier."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cliente_sk
+        description: "Customer dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_cliente')
+                field: cliente_sk
+
+      - name: data_sk
+        description: "Date dimension foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_data')
+                field: data_sk
+
+      - name: valor_contratado
+        description: "Contracted loan amount."
+        data_tests:
+          - not_null
+
+      - name: parcelas
+        description: "Number of installments contracted."
+        data_tests:
+          - not_null
+
+      - name: valor_medio_parcela
+        description: "Contracted amount divided by the number of installments."
+        data_tests:
+          - not_null
+
+      - name: data_contrato
+        description: "Loan contract date."
         data_tests:
           - not_null

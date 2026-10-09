@@ -4,6 +4,12 @@ with datas as (
         cast(data_hora as date) as data
     from {{ ref('stg_transacoes') }}
 
+    union
+
+    select distinct
+        data_contrato as data
+    from {{ ref('stg_emprestimos') }}
+
 )
 
 select

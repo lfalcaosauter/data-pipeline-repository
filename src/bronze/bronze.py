@@ -157,7 +157,7 @@ def write_success_marker(
     return marker_path
 
 
-def run_bronze_layer() -> None:
+def run_bronze_layer(db_connection=None) -> None:
     """Extract source data and persist an immutable Bronze snapshot."""
     batch_id = str(uuid.uuid4())
     ingestion_ts = datetime.now(UTC)
@@ -170,7 +170,7 @@ def run_bronze_layer() -> None:
     )
 
     try:
-        raw_data = extract_all()
+        raw_data = extract_all(db_connection=db_connection)
 
         validate_extracted_data(raw_data)
 

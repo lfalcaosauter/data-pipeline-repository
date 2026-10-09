@@ -56,11 +56,11 @@ def insert_agencias(
     )
 
 
-def main() -> None:
+def main(db_connection=None) -> None:
     """Generate and load synthetic banking data."""
     Faker.seed(FAKER_SEED)
 
-    connection = get_database_connection()
+    connection = db_connection or get_database_connection()
 
     try:
         with connection, connection.cursor() as cursor:

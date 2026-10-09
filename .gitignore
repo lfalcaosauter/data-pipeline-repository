@@ -44,3 +44,10 @@ htmlcov/
 dbt/target/
 dbt/logs/
 dbt/dbt_packages/
+
+# Airflow runtime artifacts
+airflow/logs/
+airflow/**/__pycache__/
+
+# Local backup files
+*.backup

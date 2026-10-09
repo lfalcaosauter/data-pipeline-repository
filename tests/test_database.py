@@ -1,10 +1,11 @@
 """Integration tests for the PostgreSQL banking OLTP database."""
-
 import os
 
 import psycopg2
 import pytest
+from dotenv import load_dotenv
 
+load_dotenv()
 TABLES = (
     "agencias",
     "clientes",

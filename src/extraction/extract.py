@@ -166,20 +166,28 @@ def extract_table(
             connection_to_use.close()
 
 
-def extract_all() -> dict[str, pd.DataFrame]:
+def extract_all(
+    db_connection: connection | None = None,
+) -> dict[str, pd.DataFrame]:
     """Extract all configured source tables."""
     logger.info(
         "Starting OLTP extraction | tables=%d",
         len(SOURCE_TABLES),
     )
 
-    db_connection = get_database_connection()
+    owns_connection = db_connection is None
+
+    connection_to_use = (
+        db_connection
+        if db_connection is not None
+        else get_database_connection()
+    )
 
     try:
         extracted_data = {
             table_name: extract_table(
                 table_name=table_name,
-                db_connection=db_connection,
+                db_connection=connection_to_use,
             )
             for table_name in SOURCE_TABLES
         }
@@ -187,8 +195,8 @@ def extract_all() -> dict[str, pd.DataFrame]:
         return extracted_data
 
     finally:
-        db_connection.close()
-
+        if owns_connection:
+            connection_to_use.close()
 
 def main() -> None:
     """Run extraction and log the extracted row counts."""

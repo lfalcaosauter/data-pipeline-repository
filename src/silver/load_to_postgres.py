@@ -1,8 +1,10 @@
+
 import logging
 from pathlib import Path
 from typing import cast
 
 import pandas as pd
+from psycopg2.extensions import connection as PostgreSQLConnection
 from psycopg2.extras import execute_values
 
 from config import SILVER_DIR
@@ -188,9 +190,7 @@ def get_silver_table_path(
 
 def create_silver_schema(cursor) -> None:
     """Create the PostgreSQL Silver schema."""
-    cursor.execute(
-        "CREATE SCHEMA IF NOT EXISTS silver"
-    )
+    cursor.execute("CREATE SCHEMA IF NOT EXISTS silver")
 
 
 def create_silver_tables(cursor) -> None:
@@ -206,9 +206,7 @@ def truncate_silver_tables(cursor) -> None:
         for table_name in SILVER_TABLES
     )
 
-    cursor.execute(
-        f"TRUNCATE TABLE {table_names}"
-    )
+    cursor.execute(f"TRUNCATE TABLE {table_names}")
 
 
 def load_dataframe(
@@ -274,8 +272,15 @@ def load_dataframe(
     )
 
 
-def run_silver_postgres_load() -> None:
-    """Load the latest complete Silver batch into PostgreSQL."""
+def run_silver_postgres_load(
+    db_connection: PostgreSQLConnection | None = None,
+) -> None:
+    """Load the latest complete Silver batch into PostgreSQL.
+
+    When a connection is provided, its lifecycle remains the
+    caller's responsibility. Without one, create and close a
+    connection using the local application configuration.
+    """
     batch_id, ingestion_date = find_latest_complete_batch()
 
     logger.info(
@@ -285,7 +290,8 @@ def run_silver_postgres_load() -> None:
         ingestion_date,
     )
 
-    connection = get_database_connection()
+    owns_connection = db_connection is None
+    connection = db_connection or get_database_connection()
 
     try:
         with connection, connection.cursor() as cursor:
@@ -321,7 +327,8 @@ def run_silver_postgres_load() -> None:
         )
 
     finally:
-        connection.close()
+        if owns_connection:
+            connection.close()
 
 
 if __name__ == "__main__":
