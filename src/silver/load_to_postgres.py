@@ -7,7 +7,7 @@ import pandas as pd
 from psycopg2.extensions import connection as PostgreSQLConnection
 from psycopg2.extras import execute_values
 
-from config import SILVER_DIR
+from silver.config import SILVER_DIR
 from silver.io import find_latest_complete_batch
 from utils.database import get_database_connection
 

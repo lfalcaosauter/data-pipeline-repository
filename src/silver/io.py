@@ -1,3 +1,4 @@
+
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -20,6 +21,11 @@ def get_batch_ids(table_name: str) -> set[str]:
     table_dir = BRONZE_DIR / table_name
 
     if not table_dir.exists():
+        logger.warning(
+            "Bronze table directory not found | table=%s | path=%s",
+            table_name,
+            table_dir,
+        )
         return set()
 
     batch_ids: set[str] = set()
@@ -30,6 +36,13 @@ def get_batch_ids(table_name: str) -> set[str]:
         for part in relative_parts:
             if part.startswith("batch_id="):
                 batch_ids.add(part.split("=", 1)[1])
+
+    logger.info(
+        "Bronze batches discovered | table=%s | count=%d | path=%s",
+        table_name,
+        len(batch_ids),
+        table_dir,
+    )
 
     return batch_ids
 
@@ -63,10 +76,22 @@ def get_batch_ingestion_timestamp(
     if not batch_files:
         raise FileNotFoundError(
             f"Bronze batch not found | table={table_name} | "
-            f"batch_id={batch_id}"
+            f"batch_id={batch_id} | directory={table_dir}"
+        )
+
+    if len(batch_files) > 1:
+        raise RuntimeError(
+            f"Multiple Bronze files found | table={table_name} | "
+            f"batch_id={batch_id} | files={len(batch_files)}"
         )
 
     df = pd.read_parquet(batch_files[0])
+
+    if df.empty:
+        raise ValueError(
+            f"Bronze batch is empty | table={table_name} | "
+            f"batch_id={batch_id}"
+        )
 
     if "_ingestion_timestamp" not in df.columns:
         raise ValueError(
@@ -84,7 +109,32 @@ def get_batch_ingestion_timestamp(
 
 def find_latest_complete_batch() -> tuple[str, str]:
     """Find the most recent Bronze batch available for every table."""
+    logger.info(
+        "Checking Bronze batches | root=%s | root_exists=%s | tables=%s",
+        BRONZE_DIR,
+        BRONZE_DIR.exists(),
+        SOURCE_TABLES,
+    )
+
+    for table_name in SOURCE_TABLES:
+        table_dir = BRONZE_DIR / table_name
+
+        logger.info(
+            "Bronze batch diagnostic | table=%s | directory=%s | "
+            "exists=%s | batches=%d",
+            table_name,
+            table_dir,
+            table_dir.exists(),
+            len(get_batch_ids(table_name)),
+        )
+
     common_batches = get_common_batch_ids()
+
+    logger.info(
+        "Bronze batch diagnostic | common_batches=%d | batch_ids=%s",
+        len(common_batches),
+        sorted(common_batches),
+    )
 
     if not common_batches:
         raise RuntimeError(
@@ -99,9 +149,7 @@ def find_latest_complete_batch() -> tuple[str, str]:
             batch_id,
         )
 
-        batch_metadata.append(
-            (batch_id, timestamp)
-        )
+        batch_metadata.append((batch_id, timestamp))
 
     batch_id, ingestion_timestamp = max(
         batch_metadata,
@@ -143,7 +191,7 @@ def read_bronze_table(
     if len(batch_files) > 1:
         raise RuntimeError(
             f"Multiple Bronze files found | table={table_name} | "
-            f"batch_id={batch_id}"
+            f"batch_id={batch_id} | files={len(batch_files)}"
         )
 
     df = pd.read_parquet(batch_files[0])
